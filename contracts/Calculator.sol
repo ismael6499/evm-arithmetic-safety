@@ -5,42 +5,42 @@ contract Calculator{
 
     uint256 public result = 1;
 
-    modifier checkMaxPowerNumber(uint256 num1_){
-        if(num1_ > 10) revert();
+    modifier checkMaxPowerNumber(uint256 _num1){
+        if(_num1 > 10) revert();
         _;
     }
 
-    modifier checkNotZero(int256 num1_){
-        if (num1_ == 0) revert();
+    modifier checkNotZero(int256 _num1){
+        if (_num1 == 0) revert();
         _;
     }
 
     event Addition(uint256 num1, uint256 num2, uint256 result);
     event Substraction(int256 num1, int256 num2, int256 result);
 
-    function add(uint256 num1_, uint256 num2_) public returns(uint256 result_) {
-        result_ = num1_+num2_;
-        emit Addition(num1_, num2_, result_);
+    function add(uint256 _num1, uint256 _num2) public returns(uint256 _result) {
+        _result = _num1+_num2;
+        emit Addition(_num1, _num2, _result);
     }
 
-    function substract(int256 num1_, int256 num2_) public returns (int256 result_){
-        result_ = substraction_logic(num1_, num2_);
-        emit Substraction(num1_, num2_, result_);
+    function substract(int256 _num1, int256 _num2) public returns (int256 _result){
+        _result = substraction_logic(_num1, _num2);
+        emit Substraction(_num1, _num2, _result);
     }
 
-    function divide(int256 num1_, int256 num2_) public pure checkNotZero(num2_) returns (int256 result_){
-        result_ = num1_ / num2_;
+    function divide(int256 _num1, int256 _num2) public pure checkNotZero(_num2) returns (int256 _result){
+        _result = _num1 / _num2;
     }
 
-    function multiply(uint256 num1_, uint256 num2_) public{
-        result = num1_ * num2_;
+    function multiply(uint256 _num1, uint256 _num2) public{
+        result = _num1 * _num2;
     }
 
-    function power(uint256 num1_) public checkMaxPowerNumber(num1_){
-        result = result ** num1_;
+    function power(uint256 _num1) public checkMaxPowerNumber(_num1){
+        result = result ** _num1;
     }
     
-    function substraction_logic(int256 num1_, int256 num2_) pure  internal returns (int256 result_){
-        return num1_ - num2_;
+    function substraction_logic(int256 _num1, int256 _num2) pure  internal returns (int256 _result){
+        return _num1 - _num2;
     }
 }
