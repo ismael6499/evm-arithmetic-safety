@@ -1,38 +1,43 @@
-# 🧮 Calculator App: EVM Arithmetic & Logic Encapsulation
+# 🛡️ EVM Arithmetic Safety & Logic Encapsulation
 
-A robust smart contract implementation exploring arithmetic operations within the EVM, focusing on gas-efficient validation patterns and strict type safety.
+![Solidity](https://img.shields.io/badge/Solidity-0.8.24-363636?style=flat-square&logo=solidity)
+![License](https://img.shields.io/badge/License-LGPL_3.0-blue?style=flat-square)
 
-## 🚀 Engineering Context
+A reference implementation exploring **arithmetic safety** within the EVM, focusing on mixed-type operations (Signed vs. Unsigned), gas-efficient validation patterns, and strict logic encapsulation.
 
-As a **Java Software Engineer**, arithmetic operations are typically abstracted away by the JVM. In **Solidity**, however, mathematical operations require rigorous attention to **Gas Consumption** and **Type Safety** (Signed vs. Unsigned integers).
+Unlike high-level languages where arithmetic is abstracted, Solidity requires rigorous handling of storage slots and overflow protection. This project serves as a pattern for handling `int256` state changes and enforcing "Fail Early" mechanisms.
 
-This project focuses on the architectural differences in error handling: moving from Java's runtime exception model (`try/catch`) to Solidity's "Fail Early" pattern using **Modifiers**, ensuring transactions revert before consuming execution gas on invalid inputs.
+## 🏗 Architecture & Patterns
 
-## 💡 Project Overview
+### 1. Type Safety (Signed vs. Unsigned)
+- **Mixed State Strategies:** The contract explicitly handles `int256` for operations that may result in negative balances or values (Subtraction/Division), demonstrating awareness of EVM storage behavior for signed integers vs. standard `uint256` usage.
+- **Underflow/Overflow Protection:** Leverages Solidity 0.8.x built-in overflow checks while maintaining explicit logic for business-rule constraints.
 
-The **Calculator App** handles core mathematical operations (addition, subtraction, multiplication, division, and power) with enforced constraints.
+### 2. Gas Optimization
+- **Custom Errors vs Strings:** Replaced standard `require(condition, "Message")` with custom `error DivisionByZero()` and `error MaxPowerExceeded()`.
+    - *Impact:* Reduces bytecode size and runtime gas costs during revert operations.
+- **Fail-Early Modifiers:** Implementation of declarative validation (`checkMaxPowerNumber`) to decouple security checks from core business logic, ensuring transactions revert before executing heavy arithmetic opcodes.
 
-### 🔍 Key Technical Features:
+### 3. Encapsulation & Observability
+- **Internal Logic Separation:** Core logic (e.g., `_subtractionLogic`) is isolated in `internal pure` functions, reducing the attack surface of the public API.
+- **Event Logging:** Emission of indexed events (`Addition`, `Subtraction`) to allow off-chain indexers (The Graph) to track state changes without querying contract storage.
 
-* **Declarative Validation (Modifiers):**
-    * Implemented `checkMaxPowerNumber` and `checkNotZero` to decouple validation logic from business logic.
-    * *Comparison:* This functions similarly to **Aspect-Oriented Programming (AOP)** or custom annotations in Java/Spring, allowing for cleaner code reuse and ensuring gas isn't wasted on invalid operations.
+## 🛠 Tech Stack
 
-* **Type Safety (Int256 vs Uint256):**
-    * Explicit handling of signed integers (`int256`) to support negative results in subtraction and division, addressing specific EVM storage slot behaviors that differ from standard Java primitives.
+* **Language:** Solidity `^0.8.24`
+* **Features:** Custom Errors, Modifiers, Event Logging
+* **License:** LGPL-3.0-only
 
-* **Encapsulation & Visibility:**
-    * Strict separation of public entry points and internal logic (e.g., `substraction_logic`) to maintain a secure API surface, mirroring Java's `private`/`protected` encapsulation principles.
+## 📝 Contract Interface
 
-* **Observability (Events):**
-    * Emission of `Addition` and `Substraction` events to enable asynchronous state tracking by off-chain indexers.
+The system exposes a secured API for arithmetic operations:
 
-## 🛠️ Stack & Tools
-
-* **Language:** Solidity `^0.8.24`.
-* **Concepts:** Modifiers, Visibility Specifiers, Event Logging.
-* **License:** LGPL-3.0-only.
+```solidity
+// Example of secured entry point
+function power(uint256 _num1) external checkMaxPowerNumber(_num1) {
+    result = result ** _num1;
+}
+```
 
 ---
-
-*This project demonstrates low-level arithmetic handling and logic encapsulation on the Ethereum blockchain.*
+*Reference implementation for secure arithmetic handling on Ethereum.*
